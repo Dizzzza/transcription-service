@@ -61,11 +61,6 @@ export const TaskList = forwardRef<TaskListRef, { initialTasks?: Task[] }>(
               >
                 <div>
                   <Text strong>Task ID:</Text> <Text code>{task.id}</Text>
-                  <div>
-                    <a href={task.s3Url} target="_blank" rel="noreferrer">
-                      Открыть файл
-                    </a>
-                  </div>
                 </div>
 
                 <div>
