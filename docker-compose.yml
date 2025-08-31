@@ -14,7 +14,6 @@ services:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - MINIO_BUCKET=${MINIO_BUCKET}
-      - S3_BUCKET=${S3_BUCKET}
       - FRONT_PORT=${FRONT_PORT}
     volumes:
       - ./back:/usr/src/app

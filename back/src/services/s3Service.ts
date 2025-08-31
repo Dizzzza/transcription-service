@@ -4,7 +4,7 @@ import { s3 } from '../connections/s3.js';
 import { v4 as uuid } from 'uuid';
 import path from 'path';
 
-const BUCKET = process.env.S3_BUCKET || 'files';
+const BUCKET = process.env.MINIO_BUCKET || 'files';
 
 export const generatePresignedUrl = async (fileName: string) => {
   const ext = path.extname(fileName); // возьмём только расширение
