@@ -16,7 +16,7 @@ export const TaskList = forwardRef<TaskListRef, { initialTasks?: Task[] }>(
     );
 
     // подтягиваем все задачи + обновляем каждую секунду
-    const { data, loading, error } = useGetAllTasks();
+    const { data, error } = useGetAllTasks();
 
     // если пришли новые данные — обновляем стейт
     useEffect(() => {
@@ -34,11 +34,6 @@ export const TaskList = forwardRef<TaskListRef, { initialTasks?: Task[] }>(
     useImperativeHandle(ref, () => ({
       addTask,
     }));
-
-    // обработка состояний загрузки/ошибки
-    if (loading && Object.keys(tasks).length === 0) {
-      return <Spin tip="Загрузка задач..." />;
-    }
 
     if (error) {
       return (
