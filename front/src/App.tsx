@@ -5,24 +5,17 @@ import { UploadForm } from "./components/UploadForm";
 import { TaskList, type TaskListRef } from "./components/TaskList";
 import { Layout, Typography, Divider } from "antd";
 import "antd/dist/reset.css";
+import type { Task } from "./graphql/operations";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
 
 function App() {
-  // для простоты — будем обращаться к TaskList через window.__addTask (или можно поднять стейт в App)
   const taskListRef = useRef<TaskListRef>(null);
 
-  const handleTaskCreated = (task: {
-    id: string;
-    status: string;
-    s3Url: string;
-  }) => {
-    // если у тебя есть публичный метод, можно вызвать:
-    if (window.__addTask) {
-      window.__addTask(task);
-    }
-    // или можно хранить tasks в App и прокинуть в TaskList через props
+  const handleTaskCreated = (task: Task) => {
+    // сразу добавляем таску в TaskList
+    taskListRef.current?.addTask(task);
   };
 
   return (

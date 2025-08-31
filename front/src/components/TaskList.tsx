@@ -1,18 +1,7 @@
-import {
-  useEffect,
-  useState,
-  useCallback,
-  useImperativeHandle,
-  forwardRef,
-} from "react";
-import { Card, Tag, List, Spin, Typography } from "antd";
-import { apolloClient } from "../apollo/client";
+import { useEffect, useState, useImperativeHandle, forwardRef } from "react";
+import { Card, Tag, List, Spin, Typography, Alert } from "antd";
 import type { Task } from "../graphql/operations";
-import {
-  GET_TASK,
-  type GetTaskResponse,
-  type GetTaskVars,
-} from "../graphql/operations";
+import { useGetAllTasks } from "../graphql/hooks";
 
 const { Text } = Typography;
 
@@ -26,42 +15,40 @@ export const TaskList = forwardRef<TaskListRef, { initialTasks?: Task[] }>(
       Object.fromEntries(initialTasks.map((t) => [t.id, t]))
     );
 
-    const updateTaskFromServer = useCallback(async (id: string) => {
-      try {
-        const { data } = await apolloClient.query<GetTaskResponse, GetTaskVars>(
-          {
-            query: GET_TASK,
-            variables: { id },
-            fetchPolicy: "network-only",
-          }
-        );
+    // подтягиваем все задачи + обновляем каждую секунду
+    const { data, loading, error } = useGetAllTasks();
 
-        if (data?.task) {
-          setTasks((prev) => ({ ...prev, [id]: data.task }));
-        }
-      } catch (err) {
-        console.error("Failed fetching task", id, err);
-      }
-    }, []);
-
+    // если пришли новые данные — обновляем стейт
     useEffect(() => {
-      const interval = setInterval(() => {
-        Object.values(tasks).forEach((t) => {
-          if (t.status === "processing") updateTaskFromServer(t.id);
-        });
-      }, 3000);
-
-      return () => clearInterval(interval);
-    }, [tasks, updateTaskFromServer]);
+      if (data?.getAllTasks) {
+        setTasks(
+          Object.fromEntries(data.getAllTasks.map((t: Task) => [t.id, t]))
+        );
+      }
+    }, [data]);
 
     // метод для добавления новой задачи
     const addTask = (task: Task) =>
       setTasks((prev) => ({ ...prev, [task.id]: task }));
 
-    // пробрасываем наружу
     useImperativeHandle(ref, () => ({
       addTask,
     }));
+
+    // обработка состояний загрузки/ошибки
+    if (loading && Object.keys(tasks).length === 0) {
+      return <Spin tip="Загрузка задач..." />;
+    }
+
+    if (error) {
+      return (
+        <Alert
+          type="error"
+          message="Ошибка загрузки задач"
+          description={error.message}
+        />
+      );
+    }
 
     return (
       <List

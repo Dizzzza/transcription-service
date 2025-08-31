@@ -4,9 +4,10 @@ import { UploadOutlined } from "@ant-design/icons";
 import type { RcFile } from "antd/es/upload/interface";
 import type { UploadRequestOption as RcCustomRequestOptions } from "rc-upload/lib/interface";
 import { useGenerateUploadUrl, useCreateTask } from "../graphql/hooks";
+import type { Task } from "../graphql/operations";
 
 type Props = {
-  onTaskCreated: (task: { id: string; status: string; s3Url: string }) => void;
+  onTaskCreated: (task: Task) => void;
 };
 
 export const UploadForm: React.FC<Props> = ({ onTaskCreated }) => {
@@ -16,10 +17,10 @@ export const UploadForm: React.FC<Props> = ({ onTaskCreated }) => {
     const file = options.file as RcFile;
     try {
       const { data } = await generateUploadUrl({
-        variables: { filename: file.name },
+        variables: { fileName: file.name },
       });
       if (!data) throw new Error("No data from server");
-      const uploadUrl: string = data?.generateUploadUrl.uploadUrl;
+      const uploadUrl: string = data?.generateUploadUrl;
       if (!uploadUrl) throw new Error("No upload URL");
 
       await uploadToS3(uploadUrl, file, (percent) => {
@@ -28,7 +29,6 @@ export const UploadForm: React.FC<Props> = ({ onTaskCreated }) => {
 
       const { data: taskData } = await createTask({
         variables: {
-          id: file.uid,
           s3Url: uploadUrl.split("?")[0],
         },
       });

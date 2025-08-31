@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 type TaskStatus = 'processing' | 'completed';
 
 export interface Task {
@@ -9,7 +10,9 @@ export interface Task {
 
 const tasks: Record<string, Task> = {};
 
-export const createTask = (id: string, s3Url: string) => {
+export const createTask = (s3Url: string) => {
+  const id = uuidv4();
+
   tasks[id] = { id, status: 'processing', s3Url };
 
   setTimeout(() => {
@@ -19,6 +22,11 @@ export const createTask = (id: string, s3Url: string) => {
       task.transcription = 'Это тестовый результат транскрибации 🎤';
     }
   }, 15000);
+
+  // Возвращаем id сразу
+  return { id };
 };
 
 export const getTask = (id: string) => tasks[id];
+
+export const getAllTasks = () => Object.values(tasks);

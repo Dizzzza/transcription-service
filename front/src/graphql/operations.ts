@@ -10,13 +10,11 @@ export interface Task {
 }
 
 export interface GenerateUploadUrlResponse {
-  generateUploadUrl: {
-    uploadUrl: string;
-  };
+  generateUploadUrl: string;
 }
 
 export interface GenerateUploadUrlVars {
-  filename: string;
+  fileName: string;
 }
 
 // ---- CREATE_TASK ----
@@ -25,7 +23,6 @@ export interface CreateTaskResponse {
 }
 
 export interface CreateTaskVars {
-  id: string;
   s3Url: string;
 }
 
@@ -38,17 +35,19 @@ export interface GetTaskVars {
   id: string;
 }
 
+// ---- GET_ALL_TASKS ----
+export interface GetAllTasksResponse {
+  getAllTasks: Task[];
+}
 export const GENERATE_UPLOAD_URL = gql`
-  mutation GenerateUploadUrl($filename: String!) {
-    generateUploadUrl(filename: $filename) {
-      uploadUrl
-    }
+  mutation GenerateUploadUrl($fileName: String!) {
+    generateUploadUrl(fileName: $fileName)
   }
 `;
 
 export const CREATE_TASK = gql`
-  mutation CreateTask($id: ID!, $s3Url: String!) {
-    createTask(id: $id, s3Url: $s3Url) {
+  mutation CreateTask($s3Url: String!) {
+    createTask(s3Url: $s3Url) {
       id
       status
       s3Url
@@ -60,6 +59,17 @@ export const CREATE_TASK = gql`
 export const GET_TASK = gql`
   query GetTask($id: ID!) {
     task(id: $id) {
+      id
+      status
+      s3Url
+      transcription
+    }
+  }
+`;
+
+export const GET_ALL_TASKS = gql`
+  query GetAllTasks {
+    getAllTasks {
       id
       status
       s3Url

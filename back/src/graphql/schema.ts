@@ -10,10 +10,11 @@ export const typeDefs = gql`
 
   type Query {
     getTask(id: ID!): Task
+    getAllTasks: [Task!]!
   }
 
   type Mutation {
     generateUploadUrl(fileName: String!): String!
-    createTask(id: ID!, s3Url: String!): Task!
+    createTask(s3Url: String!): Task!
   }
 `;
