@@ -5,7 +5,7 @@ services:
     build: ./back
     container_name: transcription-back
     ports:
-      - "4000:4000"
+      - "${BACK_PORT}:${BACK_PORT}"
     depends_on:
       - minio
     environment:
@@ -15,6 +15,7 @@ services:
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - MINIO_BUCKET=${MINIO_BUCKET}
       - S3_BUCKET=${S3_BUCKET}
+      - FRONT_PORT=${FRONT_PORT}
     volumes:
       - ./back:/usr/src/app
 
@@ -22,13 +23,24 @@ services:
     build: ./front
     container_name: transcription-front
     ports:
-      - "3000:3000"
+      - "${FRONT_PORT}:${FRONT_PORT}"
     depends_on:
       - back
     environment:
       - VITE_API_URL=${VITE_API_URL}
     volumes:
       - ./front:/usr/src/app
+    command:
+      [
+        "npm",
+        "run",
+        "preview",
+        "--",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "${FRONT_PORT}",
+      ]
 
   minio:
     image: quay.io/minio/minio:latest

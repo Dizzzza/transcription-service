@@ -29,6 +29,3 @@ COPY --from=builder /app/dist ./dist
 RUN npm ci
 
 EXPOSE 3000
-
-# Запуск preview-сервера
-CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "3000"]

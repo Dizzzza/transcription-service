@@ -15,11 +15,20 @@ async function startServer() {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
+    formatError: (err) => ({
+      message: err.message,
+      code: err.extensions?.code || 'INTERNAL_SERVER_ERROR',
+    }),
   });
 
   await server.start();
 
-  app.use('/graphql', cors(), bodyParser.json(), expressMiddleware(server));
+  app.use(
+    '/graphql',
+    cors({ origin: [`http://localhost:${process.env.FRONT_PORT}`] }),
+    bodyParser.json(),
+    expressMiddleware(server),
+  );
 
   // Берем порт из .env или используем 3000 по умолчанию
   const PORT = process.env.BACK_PORT || 3000;
